@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Oracle Chamber</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Georgia, serif;
+      background: radial-gradient(circle at top, #151535, #050509 70%);
+      color: #f4f0ff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .screen {
+      display: none;
+      min-height: 100vh;
+      padding: 40px 22px;
+      box-sizing: border-box;
+      text-align: center;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .active {
+      display: flex;
+    }
+
+    h1 {
+      font-size: 42px;
+      color: #f7e7a6;
+      text-shadow: 0 0 18px #7d5fff;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      color: #d8ccff;
+      font-weight: normal;
+    }
+
+    p {
+      max-width: 700px;
+      line-height: 1.6;
+      font-size: 18px;
+    }
+
+    button {
+      margin-top: 25px;
+      padding: 14px 24px;
+      border: 1px solid #d8c26a;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #2b195f, #6e4cff);
+      color: white;
+      font-size: 17px;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(126, 95, 255, 0.55);
+    }
+
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .crystal {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #ffffff, #b9a7ff, #4c2a8a);
+      box-shadow: 0 0 40px #b9a7ff, 0 0 90px #6e4cff;
+      animation: pulse 3s infinite;
+      cursor: pointer;
+      margin: 30px auto;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 0.85; }
+      50% { transform: scale(1.06); opacity: 1; }
+      100% { transform: scale(1); opacity: 0.85; }
+    }
+
+    video {
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #d8c26a;
+      box-shadow: 0 0 30px #8f7cff;
+      background: black;
+    }
+
+    textarea {
+      width: 100%;
+      max-width: 600px;
+      min-height: 140px;
+      border-radius: 18px;
+      border: 1px solid #8f7cff;
+      padding: 18px;
+      font-size: 17px;
+      box-sizing: border-box;
+      background: rgba(255,255,255,0.08);
+      color: white;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      width: 100%;
+      max-width: 650px;
+      margin-top: 25px;
+    }
+
+    .card {
+      padding: 24px 10px;
+      border-radius: 18px;
+      border: 1px solid #7e6bd8;
+      background: linear-gradient(160deg, #121224, #2b195f);
+      box-shadow: 0 0 14px rgba(126, 95, 255, 0.3);
+      cursor: pointer;
+      min-height: 80px;
+    }
+
+    .card.selected {
+      border-color: #f7e7a6;
+      box-shadow: 0 0 25px #f7e7a6;
+      background: linear-gradient(160deg, #4d357f, #24124d);
+    }
+
+    .reading {
+      max-width: 760px;
+      text-align: left;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 22px;
+      padding: 24px;
+      box-shadow: 0 0 30px rgba(126, 95, 255, 0.25);
+    }
+
+    .blurred {
+      filter: blur(5px);
+      user-select: none;
+      opacity: 0.7;
+    }
+
+    .disclaimer {
+      font-size: 12px;
+      opacity: 0.65;
+      margin-top: 30px;
+      max-width: 650px;
+    }
+
+    .stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(white 1px, transparent 1px),
+        radial-gradient(#b9a7ff 1px, transparent 1px);
+      background-size: 80px 80px, 120px 120px;
+      opacity: 0.18;
+      animation: drift 30s linear infinite;
+    }
+
+    @keyframes drift {
+      from { transform: translateY(0); }
+      to { transform: translateY(80px); }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="stars"></div>
+
+  <section id="home" class="screen active">
+    <h1>Welcome, Seeker...</h1>
+    <h2>Every soul carries a question.</h2>
+    <p>Enter The Oracle Chamber for a symbolic AI-inspired reading shaped by your question, your presence, and the cards you choose.</p>
+    <button onclick="goToCamera()">Enter the Chamber</button>
+    <p class="disclaimer">The Oracle Chamber offers symbolic, AI-generated readings for reflection and entertainment. It does not predict future events or provide professional advice.</p>
+  </section>
+
+  <section id="camera" class="screen">
+    <h1>Look into the Chamber</h1>
+    <p>Remain still while your presence is acknowledged.</p>
+    <video id="video" autoplay playsinline></video>
+    <p id="cameraMessage">The Chamber is opening...</p>
+    <button id="cameraContinue" style="display:none;" onclick="showScreen('question')">Continue</button>
+  </section>
+
+  <section id="question" class="screen">
+    <h1>Your Question</h1>
+    <p>What question are you carrying?</p>
+    <textarea id="userQuestion" placeholder="Write your question here..."></textarea>
+    <button onclick="showScreen('crystal')">Continue</button>
+  </section>
+
+  <section id="crystal" class="screen">
+    <h1>The Crystal Awaits</h1>
+    <p>Close your eyes. Think of your question. When ready, touch the crystal.</p>
+    <div class="crystal" onclick="showScreen('cards')"></div>
+  </section>
+
+  <section id="cards" class="screen">
+    <h1>Choose Three Cards</h1>
+    <p>The symbols you choose will shape the reading.</p>
+    <div class="cards" id="cardContainer"></div>
+    <button id="readingButton" disabled onclick="generateReading()">Reveal My Reading</button>
+  </section>
+
+  <section id="reading" class="screen">
+    <h1>The Oracle Speaks</h1>
+    <div class="reading" id="readingText"></div>
+    <button onclick="alert('Payment will be added in the next version.')">Unlock the Complete Reading — $4.99</button>
+    <p class="disclaimer">The Oracle Chamber offers symbolic readings for reflection and entertainment only.</p>
+  </section>
+
+  <script>
+    const cards = [
+      "The Raven", "The Moon", "The Lantern", "The Storm",
+      "The Wolf", "The River", "The Crown", "The Door",
+      "The Bridge", "The Phoenix", "The Mirror", "The Flame"
+    ];
+
+    let selectedCards = [];
+
+    function showScreen(id) {
+      document.querySelectorAll(".screen").forEach(screen => {
+        screen.classList.remove("active");
+      });
+      document.getElementById(id).classList.add("active");
+    }
+
+    async function goToCamera() {
+      showScreen("camera");
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "user" },
+          audio: false
+        });
+
+        document.getElementById("video").srcObject = stream;
+
+        setTimeout(() => {
+          document.getElementById("cameraMessage").innerText = "Your presence has been received.";
+          document.getElementById("cameraContinue").style.display = "inline-block";
+        }, 5000);
+      } catch (error) {
+        document.getElementById("cameraMessage").innerText = "The Chamber could not access the camera. You may continue without it.";
+        document.getElementById("cameraContinue").style.display = "inline-block";
+      }
+    }
+
+    function createCards() {
+      const container = document.getElementById("cardContainer");
+
+      cards.forEach(cardName => {
+        const div = document.createElement("div");
+        div.className = "card";
+        div.innerText = cardName;
+
+        div.onclick = () => {
+          if (selectedCards.includes(cardName)) {
+            selectedCards = selectedCards.filter(card => card !== cardName);
+            div.classList.remove("selected");
+          } else if (selectedCards.length < 3) {
+            selectedCards.push(cardName);
+            div.classList.add("selected");
+          }
+
+          document.getElementById("readingButton").disabled = selectedCards.length !== 3;
+        };
+
+        container.appendChild(div);
+      });
+    }
+
+    function generateReading() {
+      const question = document.getElementById("userQuestion").value || "the question you have not yet spoken aloud";
+
+      const reading = `
+        <p><strong>Your Question:</strong> ${question}</p>
+
+        <p><strong>${selectedCards[0]}</strong><br>
+        This first symbol reveals the energy surrounding your present path. Something in your life is asking to be noticed, named, and faced with courage.</p>
+
+        <p><strong>${selectedCards[1]}</strong><br>
+        The second symbol points toward what is hidden. The Chamber suggests that the answer may not arrive as a sudden revelation, but as a pattern you slowly begin to recognize.</p>
+
+        <p><strong>${selectedCards[2]}</strong><br>
+        The third symbol offers the next step. You are not being asked to know the whole road. You are being asked to choose the next honest action.</p>
+
+        <p><strong>The Oracle Speaks:</strong><br>
+        The path before you is not fixed. It is being shaped by what you avoid, what you desire, and what you are finally willing to see. The Chamber does not reveal a certainty. It reveals a choice.</p>
+
+        <div class="blurred">
+          <p><strong>The Hidden Page:</strong><br>
+          A deeper message waits beneath the surface. One possibility is closing, but another is forming quietly. The signs suggest that clarity will come when you stop asking what guarantees safety and begin asking what brings you back to yourself.</p>
+        </div>
+      `;
+
+      document.getElementById("readingText").innerHTML = reading;
+      showScreen("reading");
+    }
+
+    createCards();
+  </script>
+</body>
+</html>
