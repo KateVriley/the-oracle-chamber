@@ -4,25 +4,46 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>The Oracle Chamber</title>
+
   <style>
     body {
       margin: 0;
-      font-family: Georgia, serif;
-      background: radial-gradient(circle at top, #151535, #050509 70%);
+      font-family: Georgia, "Times New Roman", serif;
+      background: radial-gradient(circle at top, #17173a, #050509 70%);
       color: #f4f0ff;
       min-height: 100vh;
       overflow-x: hidden;
     }
 
+    .stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(white 1px, transparent 1px),
+        radial-gradient(#b9a7ff 1px, transparent 1px);
+      background-size: 80px 80px, 130px 130px;
+      opacity: 0.18;
+      animation: drift 35s linear infinite;
+      z-index: 0;
+    }
+
+    @keyframes drift {
+      from { transform: translateY(0); }
+      to { transform: translateY(100px); }
+    }
+
     .screen {
       display: none;
       min-height: 100vh;
-      padding: 40px 22px;
+      padding: 42px 22px;
       box-sizing: border-box;
       text-align: center;
       align-items: center;
       justify-content: center;
       flex-direction: column;
+      position: relative;
+      z-index: 1;
     }
 
     .active {
@@ -39,10 +60,11 @@
     h2 {
       color: #d8ccff;
       font-weight: normal;
+      margin-top: 0;
     }
 
     p {
-      max-width: 700px;
+      max-width: 720px;
       line-height: 1.6;
       font-size: 18px;
     }
@@ -56,29 +78,45 @@
       color: white;
       font-size: 17px;
       cursor: pointer;
-      box-shadow: 0 0 20px rgba(126, 95, 255, 0.55);
+      box-shadow: 0 0 22px rgba(126, 95, 255, 0.55);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 30px rgba(247, 231, 166, 0.5);
     }
 
     button:disabled {
-      opacity: 0.4;
+      opacity: 0.35;
       cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .secondary-button {
+      background: rgba(255,255,255,0.08);
+      border-color: #8f7cff;
+      box-shadow: none;
+      font-size: 15px;
+      margin-left: 8px;
     }
 
     .crystal {
-      width: 180px;
-      height: 180px;
+      width: 190px;
+      height: 190px;
       border-radius: 50%;
-      background: radial-gradient(circle, #ffffff, #b9a7ff, #4c2a8a);
-      box-shadow: 0 0 40px #b9a7ff, 0 0 90px #6e4cff;
+      background: radial-gradient(circle at 35% 30%, #ffffff, #cfc4ff, #7658d8, #24124d);
+      box-shadow: 0 0 45px #b9a7ff, 0 0 100px #6e4cff;
       animation: pulse 3s infinite;
       cursor: pointer;
-      margin: 30px auto;
+      margin: 32px auto;
     }
 
     @keyframes pulse {
-      0% { transform: scale(1); opacity: 0.85; }
+      0% { transform: scale(1); opacity: 0.87; }
       50% { transform: scale(1.06); opacity: 1; }
-      100% { transform: scale(1); opacity: 0.85; }
+      100% { transform: scale(1); opacity: 0.87; }
     }
 
     video {
@@ -87,14 +125,14 @@
       border-radius: 50%;
       object-fit: cover;
       border: 3px solid #d8c26a;
-      box-shadow: 0 0 30px #8f7cff;
+      box-shadow: 0 0 35px #8f7cff;
       background: black;
     }
 
     textarea {
       width: 100%;
-      max-width: 600px;
-      min-height: 140px;
+      max-width: 620px;
+      min-height: 145px;
       border-radius: 18px;
       border: 1px solid #8f7cff;
       padding: 18px;
@@ -102,6 +140,12 @@
       box-sizing: border-box;
       background: rgba(255,255,255,0.08);
       color: white;
+      outline: none;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    textarea::placeholder {
+      color: rgba(255,255,255,0.55);
     }
 
     .cards {
@@ -109,7 +153,7 @@
       grid-template-columns: repeat(2, 1fr);
       gap: 14px;
       width: 100%;
-      max-width: 650px;
+      max-width: 680px;
       margin-top: 25px;
     }
 
@@ -121,52 +165,90 @@
       box-shadow: 0 0 14px rgba(126, 95, 255, 0.3);
       cursor: pointer;
       min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 24px rgba(185, 167, 255, 0.55);
     }
 
     .card.selected {
       border-color: #f7e7a6;
-      box-shadow: 0 0 25px #f7e7a6;
+      box-shadow: 0 0 28px #f7e7a6;
       background: linear-gradient(160deg, #4d357f, #24124d);
     }
 
     .reading {
-      max-width: 760px;
+      max-width: 800px;
       text-align: left;
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 22px;
-      padding: 24px;
-      box-shadow: 0 0 30px rgba(126, 95, 255, 0.25);
+      background: rgba(255,255,255,0.075);
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 24px;
+      padding: 26px;
+      box-shadow: 0 0 35px rgba(126, 95, 255, 0.25);
+    }
+
+    .reading p {
+      max-width: none;
     }
 
     .blurred {
       filter: blur(5px);
       user-select: none;
-      opacity: 0.7;
+      opacity: 0.72;
+      margin-top: 10px;
+    }
+
+    .unlock-box {
+      margin-top: 20px;
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(247, 231, 166, 0.08);
+      border: 1px solid rgba(247, 231, 166, 0.28);
+      text-align: center;
     }
 
     .disclaimer {
       font-size: 12px;
-      opacity: 0.65;
+      opacity: 0.68;
       margin-top: 30px;
-      max-width: 650px;
+      max-width: 700px;
     }
 
-    .stars {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      background-image:
-        radial-gradient(white 1px, transparent 1px),
-        radial-gradient(#b9a7ff 1px, transparent 1px);
-      background-size: 80px 80px, 120px 120px;
-      opacity: 0.18;
-      animation: drift 30s linear infinite;
+    .small-note {
+      font-size: 14px;
+      opacity: 0.75;
     }
 
-    @keyframes drift {
-      from { transform: translateY(0); }
-      to { transform: translateY(80px); }
+    @media (min-width: 700px) {
+      .cards {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 420px) {
+      h1 {
+        font-size: 34px;
+      }
+
+      p {
+        font-size: 16px;
+      }
+
+      video {
+        width: 230px;
+        height: 230px;
+      }
+
+      .crystal {
+        width: 160px;
+        height: 160px;
+      }
     }
   </style>
 </head>
@@ -175,11 +257,13 @@
   <div class="stars"></div>
 
   <section id="home" class="screen active">
-    <h1>Welcome, Seeker...</h1>
-    <h2>Every soul carries a question.</h2>
-    <p>Enter The Oracle Chamber for a symbolic AI-inspired reading shaped by your question, your presence, and the cards you choose.</p>
+    <h1>The Oracle Chamber</h1>
+    <h2>Welcome, Seeker...</h2>
+    <p>Every soul carries a question. Enter the Chamber for a symbolic reading shaped by your question, your presence, and the three cards you choose.</p>
     <button onclick="goToCamera()">Enter the Chamber</button>
-    <p class="disclaimer">The Oracle Chamber offers symbolic, AI-generated readings for reflection and entertainment. It does not predict future events or provide professional advice.</p>
+    <p class="disclaimer">
+      The Oracle Chamber offers symbolic, AI-inspired readings for reflection and entertainment. It does not predict future events or provide medical, legal, financial, or professional advice.
+    </p>
   </section>
 
   <section id="camera" class="screen">
@@ -187,13 +271,17 @@
     <p>Remain still while your presence is acknowledged.</p>
     <video id="video" autoplay playsinline></video>
     <p id="cameraMessage">The Chamber is opening...</p>
-    <button id="cameraContinue" style="display:none;" onclick="showScreen('question')">Continue</button>
+    <div>
+      <button id="cameraContinue" style="display:none;" onclick="showScreen('question')">Continue</button>
+      <button class="secondary-button" onclick="showScreen('question')">Skip Camera</button>
+    </div>
+    <p class="small-note">Your camera is used only as part of the ritual experience in this prototype.</p>
   </section>
 
   <section id="question" class="screen">
     <h1>Your Question</h1>
     <p>What question are you carrying?</p>
-    <textarea id="userQuestion" placeholder="Write your question here..."></textarea>
+    <textarea id="userQuestion" placeholder="Example: Should I change jobs? Does this relationship have a future? Should I move?"></textarea>
     <button onclick="showScreen('crystal')">Continue</button>
   </section>
 
@@ -205,7 +293,7 @@
 
   <section id="cards" class="screen">
     <h1>Choose Three Cards</h1>
-    <p>The symbols you choose will shape the reading.</p>
+    <p>The symbols you choose will shape the reading. Select exactly three.</p>
     <div class="cards" id="cardContainer"></div>
     <button id="readingButton" disabled onclick="generateReading()">Reveal My Reading</button>
   </section>
@@ -213,8 +301,17 @@
   <section id="reading" class="screen">
     <h1>The Oracle Speaks</h1>
     <div class="reading" id="readingText"></div>
-    <button onclick="alert('Payment will be added in the next version.')">Unlock the Complete Reading — $4.99</button>
-    <p class="disclaimer">The Oracle Chamber offers symbolic readings for reflection and entertainment only.</p>
+
+    <div class="unlock-box">
+      <p><strong>The Chamber has revealed only the first page of your path.</strong></p>
+      <button onclick="alert('Payment will be added in the next version.')">Unlock the Complete Reading — $4.99</button>
+      <br />
+      <button class="secondary-button" onclick="restartReading()">Start Another Reading</button>
+    </div>
+
+    <p class="disclaimer">
+      Symbolic reflection only. Not a prediction, diagnosis, or professional recommendation.
+    </p>
   </section>
 
   <script>
@@ -230,11 +327,25 @@
       document.querySelectorAll(".screen").forEach(screen => {
         screen.classList.remove("active");
       });
-      document.getElementById(id).classList.add("active");
+
+      const target = document.getElementById(id);
+      if (target) {
+        target.classList.add("active");
+      }
     }
 
     async function goToCamera() {
       showScreen("camera");
+
+      const message = document.getElementById("cameraMessage");
+      const continueButton = document.getElementById("cameraContinue");
+      const video = document.getElementById("video");
+
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        message.innerText = "The Chamber could not access the camera. You may continue without it.";
+        continueButton.style.display = "inline-block";
+        return;
+      }
 
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -242,20 +353,23 @@
           audio: false
         });
 
-        document.getElementById("video").srcObject = stream;
+        video.srcObject = stream;
 
         setTimeout(() => {
-          document.getElementById("cameraMessage").innerText = "Your presence has been received.";
-          document.getElementById("cameraContinue").style.display = "inline-block";
+          message.innerText = "Your presence has been received.";
+          continueButton.style.display = "inline-block";
         }, 5000);
+
       } catch (error) {
-        document.getElementById("cameraMessage").innerText = "The Chamber could not access the camera. You may continue without it.";
-        document.getElementById("cameraContinue").style.display = "inline-block";
+        message.innerText = "The Chamber could not access the camera. You may continue without it.";
+        continueButton.style.display = "inline-block";
       }
     }
 
     function createCards() {
       const container = document.getElementById("cardContainer");
+      container.innerHTML = "";
+      selectedCards = [];
 
       cards.forEach(cardName => {
         const div = document.createElement("div");
@@ -271,403 +385,211 @@
             div.classList.add("selected");
           }
 
-          document.getElementById("readingButton").disabled = selectedCards.length !== 3;
+          const readingButton = document.getElementById("readingButton");
+          readingButton.disabled = selectedCards.length !== 3;
         };
 
         container.appendChild(div);
       });
     }
 
+    function detectTheme(question) {
+      const q = question.toLowerCase();
+
+      if (
+        q.includes("love") ||
+        q.includes("relationship") ||
+        q.includes("marry") ||
+        q.includes("partner") ||
+        q.includes("boyfriend") ||
+        q.includes("girlfriend") ||
+        q.includes("husband") ||
+        q.includes("wife") ||
+        q.includes("soulmate") ||
+        q.includes("dating") ||
+        q.includes("ex")
+      ) {
+        return {
+          title: "Love and Relationships",
+          focus: "matters of the heart, attachment, trust, longing, and emotional truth",
+          challenge: "whether you are seeking love, certainty, closure, or reassurance",
+          advice: "notice what the relationship actually feels like, not only what you hope it could become"
+        };
+      }
+
+      if (
+        q.includes("job") ||
+        q.includes("career") ||
+        q.includes("work") ||
+        q.includes("business") ||
+        q.includes("money") ||
+        q.includes("promotion") ||
+        q.includes("quit") ||
+        q.includes("success") ||
+        q.includes("boss") ||
+        q.includes("income")
+      ) {
+        return {
+          title: "Career and Money",
+          focus: "work, ambition, money, timing, security, and the shape of your next chapter",
+          challenge: "whether fear of instability is keeping you smaller than you are meant to be",
+          advice: "look for the next practical step rather than waiting for the entire road to reveal itself"
+        };
+      }
+
+      if (
+        q.includes("family") ||
+        q.includes("mother") ||
+        q.includes("father") ||
+        q.includes("child") ||
+        q.includes("children") ||
+        q.includes("daughter") ||
+        q.includes("son") ||
+        q.includes("parent") ||
+        q.includes("sister") ||
+        q.includes("brother")
+      ) {
+        return {
+          title: "Family and Home",
+          focus: "family bonds, old patterns, loyalty, responsibility, and emotional boundaries",
+          challenge: "where love has become tangled with duty, guilt, habit, or old wounds",
+          advice: "protect your peace without closing your heart completely"
+        };
+      }
+
+      if (
+        q.includes("move") ||
+        q.includes("travel") ||
+        q.includes("leave") ||
+        q.includes("country") ||
+        q.includes("home") ||
+        q.includes("relocate") ||
+        q.includes("where should")
+      ) {
+        return {
+          title: "Change and Transition",
+          focus: "movement, transition, leaving, arriving, and the life waiting beyond the familiar",
+          challenge: "whether you are being called forward or simply trying to escape discomfort",
+          advice: "separate the fear of change from the truth of what your life is asking for"
+        };
+      }
+
+      if (
+        q.includes("should i") ||
+        q.includes("decision") ||
+        q.includes("choose") ||
+        q.includes("what should") ||
+        q.includes("right choice") ||
+        q.includes("option")
+      ) {
+        return {
+          title: "A Decision",
+          focus: "choice, consequence, intuition, and the crossing of a threshold",
+          challenge: "the part of you that wants certainty before taking responsibility for the choice",
+          advice: "choose the path that makes you more honest, not merely more comfortable"
+        };
+      }
+
+      if (
+        q.includes("health") ||
+        q.includes("sick") ||
+        q.includes("body") ||
+        q.includes("tired") ||
+        q.includes("healing") ||
+        q.includes("pain") ||
+        q.includes("anxiety")
+      ) {
+        return {
+          title: "Wellbeing",
+          focus: "energy, rest, healing, fear, and the messages your body may be asking you to notice",
+          challenge: "where you may be pushing through instead of listening carefully",
+          advice: "treat this reading as reflection only, and seek real support where your body needs real care"
+        };
+      }
+
+      return {
+        title: "The Hidden Question",
+        focus: "the hidden question beneath the question, the pattern repeating itself, and the next honest step",
+        challenge: "where uncertainty is asking you to become more truthful with yourself",
+        advice: "pay attention to what feels quietly true, even if it is not yet convenient"
+      };
+    }
+
+    function cardMeaning(cardName, theme) {
+      const meanings = {
+        "The Raven": `The Raven brings a message about what has not yet been spoken. In this question, it points toward ${theme.challenge}.`,
+        "The Moon": `The Moon suggests that not everything is visible yet. Around ${theme.focus}, emotions may be louder than facts right now.`,
+        "The Lantern": `The Lantern says clarity will come one step at a time. The next move is not to solve everything, but to see the nearest truth clearly.`,
+        "The Storm": `The Storm shows pressure, disruption, and necessary release. Something around this question may need to break open before it can become honest.`,
+        "The Wolf": `The Wolf speaks of loyalty, instinct, and protection. Ask yourself who or what you are protecting, and whether that protection still serves you.`,
+        "The River": `The River points to change that cannot be forced. The situation is moving, even if it feels still on the surface.`,
+        "The Crown": `The Crown asks you to reclaim authority. This question may be less about what will happen and more about what you are willing to choose.`,
+        "The Door": `The Door appears when a threshold is near. One version of your life may be asking to close so another can begin.`,
+        "The Bridge": `The Bridge suggests transition, repair, and connection. There may be a way forward, but it requires crossing from thought into action.`,
+        "The Phoenix": `The Phoenix brings renewal after exhaustion or loss. Something in this question may be asking to be transformed rather than rescued.`,
+        "The Mirror": `The Mirror reflects the truth you already suspect. The Chamber asks you to look directly at your own role in the pattern.`,
+        "The Flame": `The Flame reveals desire, courage, and risk. Something in you still burns for a reason. Do not ignore that signal.`
+      };
+
+      return meanings[cardName] || `This card brings symbolic guidance connected to ${theme.focus}.`;
+    }
+
     function generateReading() {
-      function detectTheme(question) {
-  const q = question.toLowerCase();
+      const questionBox = document.getElementById("userQuestion");
+      const questionRaw = questionBox ? questionBox.value.trim() : "";
+      const question = questionRaw || "the question you have not yet spoken aloud";
 
-  if (q.includes("love") || q.includes("relationship") || q.includes("marry") || q.includes("partner") || q.includes("boyfriend") || q.includes("girlfriend") || q.includes("husband") || q.includes("wife") || q.includes("soulmate")) {
-    return {
-      name: "love",
-      focus: "matters of the heart, attachment, trust, and emotional truth",
-      challenge: "whether you are seeking love, certainty, or reassurance",
-      advice: "notice what the relationship actually feels like, not only what you hope it could become"
-    };
-  }
+      if (selectedCards.length !== 3) {
+        alert("Choose exactly three cards before the Oracle speaks.");
+        return;
+      }
 
-  if (q.includes("job") || q.includes("career") || q.includes("work") || q.includes("business") || q.includes("money") || q.includes("promotion") || q.includes("quit") || q.includes("success")) {
-    return {
-      name: "career",
-      focus: "work, ambition, money, timing, and the shape of your next chapter",
-      challenge: "whether fear of instability is keeping you smaller than you are meant to be",
-      advice: "look for the next practical step rather than waiting for the entire road to reveal itself"
-    };
-  }
+      const theme = detectTheme(question);
 
-  if (q.includes("family") || q.includes("mother") || q.includes("father") || q.includes("child") || q.includes("children") || q.includes("daughter") || q.includes("son") || q.includes("parent")) {
-    return {
-      name: "family",
-      focus: "family bonds, old patterns, loyalty, responsibility, and emotional boundaries",
-      challenge: "where love has become tangled with duty, guilt, or old wounds",
-      advice: "protect your peace without closing your heart completely"
-    };
-  }
+      const first = selectedCards[0];
+      const second = selectedCards[1];
+      const third = selectedCards[2];
 
-  if (q.includes("move") || q.includes("travel") || q.includes("leave") || q.includes("country") || q.includes("home") || q.includes("relocate")) {
-    return {
-      name: "change",
-      focus: "movement, transition, leaving, arriving, and the life waiting beyond the familiar",
-      challenge: "whether you are being called forward or simply trying to escape discomfort",
-      advice: "separate the fear of change from the truth of what your life is asking for"
-    };
-  }
+      const reading = `
+        <p><strong>Your Question:</strong> ${question}</p>
 
-  if (q.includes("should i") || q.includes("decision") || q.includes("choose") || q.includes("what should") || q.includes("right choice")) {
-    return {
-      name: "decision",
-      focus: "choice, consequence, intuition, and the crossing of a threshold",
-      challenge: "the part of you that wants certainty before taking responsibility for the choice",
-      advice: "choose the path that makes you more honest, not merely more comfortable"
-    };
-  }
+        <p><strong>The Chamber senses this question is centered on: ${theme.title}.</strong></p>
 
-  if (q.includes("health") || q.includes("sick") || q.includes("body") || q.includes("tired") || q.includes("healing")) {
-    return {
-      name: "wellbeing",
-      focus: "energy, rest, healing, and the messages your body may be asking you to notice",
-      challenge: "where you may be pushing through instead of listening carefully",
-      advice: "treat this reading as reflection only, and seek real support where your body needs real care"
-    };
-  }
+        <p>This reading moves through ${theme.focus}.</p>
 
-  return {
-    name: "general",
-    focus: "the hidden question beneath the question, the pattern repeating itself, and the next honest step",
-    challenge: "where uncertainty is asking you to become more truthful with yourself",
-    advice: "pay attention to what feels quietly true, even if it is not yet convenient"
-  };
-}
+        <p><strong>${first}</strong><br>${cardMeaning(first, theme)}</p>
 
-function cardMeaning(cardName, theme) {
-  const meanings = {
-    "The Raven": `The Raven brings a message about what has not yet been spoken. In this question, it points toward ${theme.challenge}.`,
-    "The Moon": `The Moon suggests that not everything is visible yet. Around ${theme.focus}, emotions may be louder than facts right now.`,
-    "The Lantern": `The Lantern says clarity will come one step at a time. The next move is not to solve everything, but to see the nearest truth clearly.`,
-    "The Storm": `The Storm shows pressure, disruption, and necessary release. Something around this question may need to break open before it can become honest.`,
-    "The Wolf": `The Wolf speaks of loyalty, instinct, and protection. Ask yourself who or what you are protecting, and whether that protection still serves you.`,
-    "The River": `The River points to change that cannot be forced. The situation is moving, even if it feels still on the surface.`,
-    "The Crown": `The Crown asks you to reclaim authority. This question may be less about what will happen and more about what you are willing to choose.`,
-    "The Door": `The Door appears when a threshold is near. One version of your life may be asking to close so another can begin.`,
-    "The Bridge": `The Bridge suggests transition, repair, and connection. There may be a way forward, but it requires crossing from thought into action.`,
-    "The Phoenix": `The Phoenix brings renewal after exhaustion or loss. Something in this question may be asking to be transformed rather than rescued.`,
-    "The Mirror": `The Mirror reflects the truth you already suspect. The Chamber asks you to look directly at your own role in the pattern.`,
-    "The Flame": `The Flame reveals desire, courage, and risk. Something in you still burns for a reason. Do not ignore that signal.`
-  };
+        <p><strong>${second}</strong><br>${cardMeaning(second, theme)}</p>
 
-  return meanings[cardName] || `This card brings symbolic guidance connected to ${theme.focus}.`;
-}
+        <p><strong>${third}</strong><br>${cardMeaning(third, theme)}</p>
 
-function generateReading() {
-  const questionRaw = document.getElementById("userQuestion").value.trim();
-  const question = questionRaw || "the question you have not yet spoken aloud";
-  const theme = detectTheme(question);
+        <p><strong>The Oracle Speaks:</strong><br>
+        This question is not random. It has appeared because some part of you is ready to stop circling the same uncertainty. The Chamber does not offer a fixed prediction, but it does reveal a pattern: ${theme.challenge}. The path ahead asks for honesty before action, and action before certainty.</p>
 
-  const first = selectedCards[0];
-  const second = selectedCards[1];
-  const third = selectedCards[2];
+        <p><strong>Your next step:</strong> ${theme.advice}.</p>
 
-  const reading = `
-    <p><strong>Your Question:</strong> ${question}</p>
+        <div class="blurred">
+          <p><strong>The Hidden Page:</strong><br>
+          Beneath this question is a deeper choice. One path asks you to remain where things are familiar but unresolved. Another asks you to move toward a truth you may already know but have not fully admitted. The cards suggest that the next seven days should be used for observation, not panic. Watch what repeats. Watch what drains you. Watch what gives you energy. The answer will not arrive as thunder. It will arrive as recognition.</p>
 
-    <p><strong>The Chamber senses this question is centered on ${theme.focus}.</strong></p>
+          <p><strong>The Final Sign:</strong><br>
+          When the same thought returns three times, do not dismiss it. The Chamber marks it as a signal.</p>
+        </div>
+      `;
 
-    <p><strong>${first}</strong><br>
-    ${cardMeaning(first, theme)}</p>
+      document.getElementById("readingText").innerHTML = reading;
+      showScreen("reading");
+    }
 
-    <p><strong>${second}</strong><br>
-    ${cardMeaning(second, theme)}</p>
-
-    <p><strong>${third}</strong><br>
-    ${cardMeaning(third, theme)}</p>
-
-    <p><strong>The Oracle Speaks:</strong><br>
-    This question is not random. It has appeared because some part of you is ready to stop circling the same uncertainty. The Chamber does not offer a fixed prediction, but it does reveal a pattern: ${theme.challenge}. The path ahead asks for honesty before action, and action before certainty.</p>
-
-    <p>Your next step is this: ${theme.advice}.</p>
-
-    <div class="blurred">
-      <p><strong>The Hidden Page:</strong><br>
-      Beneath this question is a deeper choice. One path asks you to remain where things are familiar but unresolved. Another asks you to move toward a truth you may already know but have not fully admitted. The cards suggest that the next seven days should be used for observation, not panic. Watch what repeats. Watch what drains you. Watch what gives you energy. The answer will not arrive as thunder. It will arrive as recognition.</p>
-
-      <p><strong>The Final Sign:</strong><br>
-      When the same thought returns three times, do not dismiss it. The Chamber marks it as a signal.</p>
-    </div>
-  `;
-
-  document.getElementById("readingText").innerHTML = reading;
-  showScreen("reading");
-
+    function restartReading() {
+      selectedCards = [];
+      document.getElementById("userQuestion").value = "";
+      document.getElementById("readingButton").disabled = true;
+      createCards();
+      showScreen("home");
     }
 
     createCards();
-  <script>
-  const cards = [
-    "The Raven", "The Moon", "The Lantern", "The Storm",
-    "The Wolf", "The River", "The Crown", "The Door",
-    "The Bridge", "The Phoenix", "The Mirror", "The Flame"
-  ];
-
-  let selectedCards = [];
-
-  function showScreen(id) {
-    document.querySelectorAll(".screen").forEach(screen => {
-      screen.classList.remove("active");
-    });
-
-    const targetScreen = document.getElementById(id);
-    if (targetScreen) {
-      targetScreen.classList.add("active");
-    }
-  }
-
-  async function goToCamera() {
-    showScreen("camera");
-
-    const message = document.getElementById("cameraMessage");
-    const continueButton = document.getElementById("cameraContinue");
-    const video = document.getElementById("video");
-
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user" },
-        audio: false
-      });
-
-      video.srcObject = stream;
-
-      setTimeout(() => {
-        message.innerText = "Your presence has been received.";
-        continueButton.style.display = "inline-block";
-      }, 5000);
-
-    } catch (error) {
-      message.innerText = "The Chamber could not access the camera. You may continue without it.";
-      continueButton.style.display = "inline-block";
-    }
-  }
-
-  function createCards() {
-    const container = document.getElementById("cardContainer");
-    container.innerHTML = "";
-    selectedCards = [];
-
-    cards.forEach(cardName => {
-      const div = document.createElement("div");
-      div.className = "card";
-      div.innerText = cardName;
-
-      div.onclick = () => {
-        if (selectedCards.includes(cardName)) {
-          selectedCards = selectedCards.filter(card => card !== cardName);
-          div.classList.remove("selected");
-        } else if (selectedCards.length < 3) {
-          selectedCards.push(cardName);
-          div.classList.add("selected");
-        }
-
-        const readingButton = document.getElementById("readingButton");
-        readingButton.disabled = selectedCards.length !== 3;
-      };
-
-      container.appendChild(div);
-    });
-  }
-
-  function detectTheme(question) {
-    const q = question.toLowerCase();
-
-    if (
-      q.includes("love") ||
-      q.includes("relationship") ||
-      q.includes("marry") ||
-      q.includes("partner") ||
-      q.includes("boyfriend") ||
-      q.includes("girlfriend") ||
-      q.includes("husband") ||
-      q.includes("wife") ||
-      q.includes("soulmate") ||
-      q.includes("dating") ||
-      q.includes("ex")
-    ) {
-      return {
-        title: "Love and Relationships",
-        focus: "matters of the heart, attachment, trust, longing, and emotional truth",
-        challenge: "whether you are seeking love, certainty, closure, or reassurance",
-        advice: "notice what the relationship actually feels like, not only what you hope it could become"
-      };
-    }
-
-    if (
-      q.includes("job") ||
-      q.includes("career") ||
-      q.includes("work") ||
-      q.includes("business") ||
-      q.includes("money") ||
-      q.includes("promotion") ||
-      q.includes("quit") ||
-      q.includes("success") ||
-      q.includes("boss") ||
-      q.includes("income")
-    ) {
-      return {
-        title: "Career and Money",
-        focus: "work, ambition, money, timing, security, and the shape of your next chapter",
-        challenge: "whether fear of instability is keeping you smaller than you are meant to be",
-        advice: "look for the next practical step rather than waiting for the entire road to reveal itself"
-      };
-    }
-
-    if (
-      q.includes("family") ||
-      q.includes("mother") ||
-      q.includes("father") ||
-      q.includes("child") ||
-      q.includes("children") ||
-      q.includes("daughter") ||
-      q.includes("son") ||
-      q.includes("parent") ||
-      q.includes("sister") ||
-      q.includes("brother")
-    ) {
-      return {
-        title: "Family and Home",
-        focus: "family bonds, old patterns, loyalty, responsibility, and emotional boundaries",
-        challenge: "where love has become tangled with duty, guilt, habit, or old wounds",
-        advice: "protect your peace without closing your heart completely"
-      };
-    }
-
-    if (
-      q.includes("move") ||
-      q.includes("travel") ||
-      q.includes("leave") ||
-      q.includes("country") ||
-      q.includes("home") ||
-      q.includes("relocate") ||
-      q.includes("where should")
-    ) {
-      return {
-        title: "Change and Transition",
-        focus: "movement, transition, leaving, arriving, and the life waiting beyond the familiar",
-        challenge: "whether you are being called forward or simply trying to escape discomfort",
-        advice: "separate the fear of change from the truth of what your life is asking for"
-      };
-    }
-
-    if (
-      q.includes("should i") ||
-      q.includes("decision") ||
-      q.includes("choose") ||
-      q.includes("what should") ||
-      q.includes("right choice") ||
-      q.includes("option")
-    ) {
-      return {
-        title: "A Decision",
-        focus: "choice, consequence, intuition, and the crossing of a threshold",
-        challenge: "the part of you that wants certainty before taking responsibility for the choice",
-        advice: "choose the path that makes you more honest, not merely more comfortable"
-      };
-    }
-
-    if (
-      q.includes("health") ||
-      q.includes("sick") ||
-      q.includes("body") ||
-      q.includes("tired") ||
-      q.includes("healing") ||
-      q.includes("pain") ||
-      q.includes("anxiety")
-    ) {
-      return {
-        title: "Wellbeing",
-        focus: "energy, rest, healing, fear, and the messages your body may be asking you to notice",
-        challenge: "where you may be pushing through instead of listening carefully",
-        advice: "treat this reading as reflection only, and seek real support where your body needs real care"
-      };
-    }
-
-    return {
-      title: "The Hidden Question",
-      focus: "the hidden question beneath the question, the pattern repeating itself, and the next honest step",
-      challenge: "where uncertainty is asking you to become more truthful with yourself",
-      advice: "pay attention to what feels quietly true, even if it is not yet convenient"
-    };
-  }
-
-  function cardMeaning(cardName, theme) {
-    const meanings = {
-      "The Raven": `The Raven brings a message about what has not yet been spoken. In this question, it points toward ${theme.challenge}.`,
-      "The Moon": `The Moon suggests that not everything is visible yet. Around ${theme.focus}, emotions may be louder than facts right now.`,
-      "The Lantern": `The Lantern says clarity will come one step at a time. The next move is not to solve everything, but to see the nearest truth clearly.`,
-      "The Storm": `The Storm shows pressure, disruption, and necessary release. Something around this question may need to break open before it can become honest.`,
-      "The Wolf": `The Wolf speaks of loyalty, instinct, and protection. Ask yourself who or what you are protecting, and whether that protection still serves you.`,
-      "The River": `The River points to change that cannot be forced. The situation is moving, even if it feels still on the surface.`,
-      "The Crown": `The Crown asks you to reclaim authority. This question may be less about what will happen and more about what you are willing to choose.`,
-      "The Door": `The Door appears when a threshold is near. One version of your life may be asking to close so another can begin.`,
-      "The Bridge": `The Bridge suggests transition, repair, and connection. There may be a way forward, but it requires crossing from thought into action.`,
-      "The Phoenix": `The Phoenix brings renewal after exhaustion or loss. Something in this question may be asking to be transformed rather than rescued.`,
-      "The Mirror": `The Mirror reflects the truth you already suspect. The Chamber asks you to look directly at your own role in the pattern.`,
-      "The Flame": `The Flame reveals desire, courage, and risk. Something in you still burns for a reason. Do not ignore that signal.`
-    };
-
-    return meanings[cardName] || `This card brings symbolic guidance connected to ${theme.focus}.`;
-  }
-
-  function generateReading() {
-    const questionBox = document.getElementById("userQuestion");
-    const questionRaw = questionBox ? questionBox.value.trim() : "";
-    const question = questionRaw || "the question you have not yet spoken aloud";
-
-    const theme = detectTheme(question);
-
-    if (selectedCards.length !== 3) {
-      alert("Choose exactly three cards before the Oracle speaks.");
-      return;
-    }
-
-    const first = selectedCards[0];
-    const second = selectedCards[1];
-    const third = selectedCards[2];
-
-    const reading = `
-      <p><strong>Your Question:</strong> ${question}</p>
-
-      <p><strong>The Chamber senses this question is centered on: ${theme.title}.</strong></p>
-
-      <p>This reading moves through ${theme.focus}.</p>
-
-      <p><strong>${first}</strong><br>${cardMeaning(first, theme)}</p>
-
-      <p><strong>${second}</strong><br>${cardMeaning(second, theme)}</p>
-
-      <p><strong>${third}</strong><br>${cardMeaning(third, theme)}</p>
-
-      <p><strong>The Oracle Speaks:</strong><br>
-      This question is not random. It has appeared because some part of you is ready to stop circling the same uncertainty. The Chamber does not offer a fixed prediction, but it does reveal a pattern: ${theme.challenge}. The path ahead asks for honesty before action, and action before certainty.</p>
-
-      <p><strong>Your next step:</strong> ${theme.advice}.</p>
-
-      <div class="blurred">
-        <p><strong>The Hidden Page:</strong><br>
-        Beneath this question is a deeper choice. One path asks you to remain where things are familiar but unresolved. Another asks you to move toward a truth you may already know but have not fully admitted. The cards suggest that the next seven days should be used for observation, not panic. Watch what repeats. Watch what drains you. Watch what gives you energy. The answer will not arrive as thunder. It will arrive as recognition.</p>
-
-        <p><strong>The Final Sign:</strong><br>
-        When the same thought returns three times, do not dismiss it. The Chamber marks it as a signal.</p>
-      </div>
-    `;
-
-    document.getElementById("readingText").innerHTML = reading;
-    showScreen("reading");
-  }
-
-  createCards();
-</script>
+  </script>
 </body>
 </html>
