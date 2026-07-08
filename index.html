@@ -279,31 +279,130 @@
     }
 
     function generateReading() {
-      const question = document.getElementById("userQuestion").value || "the question you have not yet spoken aloud";
+      function detectTheme(question) {
+  const q = question.toLowerCase();
 
-      const reading = `
-        <p><strong>Your Question:</strong> ${question}</p>
+  if (q.includes("love") || q.includes("relationship") || q.includes("marry") || q.includes("partner") || q.includes("boyfriend") || q.includes("girlfriend") || q.includes("husband") || q.includes("wife") || q.includes("soulmate")) {
+    return {
+      name: "love",
+      focus: "matters of the heart, attachment, trust, and emotional truth",
+      challenge: "whether you are seeking love, certainty, or reassurance",
+      advice: "notice what the relationship actually feels like, not only what you hope it could become"
+    };
+  }
 
-        <p><strong>${selectedCards[0]}</strong><br>
-        This first symbol reveals the energy surrounding your present path. Something in your life is asking to be noticed, named, and faced with courage.</p>
+  if (q.includes("job") || q.includes("career") || q.includes("work") || q.includes("business") || q.includes("money") || q.includes("promotion") || q.includes("quit") || q.includes("success")) {
+    return {
+      name: "career",
+      focus: "work, ambition, money, timing, and the shape of your next chapter",
+      challenge: "whether fear of instability is keeping you smaller than you are meant to be",
+      advice: "look for the next practical step rather than waiting for the entire road to reveal itself"
+    };
+  }
 
-        <p><strong>${selectedCards[1]}</strong><br>
-        The second symbol points toward what is hidden. The Chamber suggests that the answer may not arrive as a sudden revelation, but as a pattern you slowly begin to recognize.</p>
+  if (q.includes("family") || q.includes("mother") || q.includes("father") || q.includes("child") || q.includes("children") || q.includes("daughter") || q.includes("son") || q.includes("parent")) {
+    return {
+      name: "family",
+      focus: "family bonds, old patterns, loyalty, responsibility, and emotional boundaries",
+      challenge: "where love has become tangled with duty, guilt, or old wounds",
+      advice: "protect your peace without closing your heart completely"
+    };
+  }
 
-        <p><strong>${selectedCards[2]}</strong><br>
-        The third symbol offers the next step. You are not being asked to know the whole road. You are being asked to choose the next honest action.</p>
+  if (q.includes("move") || q.includes("travel") || q.includes("leave") || q.includes("country") || q.includes("home") || q.includes("relocate")) {
+    return {
+      name: "change",
+      focus: "movement, transition, leaving, arriving, and the life waiting beyond the familiar",
+      challenge: "whether you are being called forward or simply trying to escape discomfort",
+      advice: "separate the fear of change from the truth of what your life is asking for"
+    };
+  }
 
-        <p><strong>The Oracle Speaks:</strong><br>
-        The path before you is not fixed. It is being shaped by what you avoid, what you desire, and what you are finally willing to see. The Chamber does not reveal a certainty. It reveals a choice.</p>
+  if (q.includes("should i") || q.includes("decision") || q.includes("choose") || q.includes("what should") || q.includes("right choice")) {
+    return {
+      name: "decision",
+      focus: "choice, consequence, intuition, and the crossing of a threshold",
+      challenge: "the part of you that wants certainty before taking responsibility for the choice",
+      advice: "choose the path that makes you more honest, not merely more comfortable"
+    };
+  }
 
-        <div class="blurred">
-          <p><strong>The Hidden Page:</strong><br>
-          A deeper message waits beneath the surface. One possibility is closing, but another is forming quietly. The signs suggest that clarity will come when you stop asking what guarantees safety and begin asking what brings you back to yourself.</p>
-        </div>
-      `;
+  if (q.includes("health") || q.includes("sick") || q.includes("body") || q.includes("tired") || q.includes("healing")) {
+    return {
+      name: "wellbeing",
+      focus: "energy, rest, healing, and the messages your body may be asking you to notice",
+      challenge: "where you may be pushing through instead of listening carefully",
+      advice: "treat this reading as reflection only, and seek real support where your body needs real care"
+    };
+  }
 
-      document.getElementById("readingText").innerHTML = reading;
-      showScreen("reading");
+  return {
+    name: "general",
+    focus: "the hidden question beneath the question, the pattern repeating itself, and the next honest step",
+    challenge: "where uncertainty is asking you to become more truthful with yourself",
+    advice: "pay attention to what feels quietly true, even if it is not yet convenient"
+  };
+}
+
+function cardMeaning(cardName, theme) {
+  const meanings = {
+    "The Raven": `The Raven brings a message about what has not yet been spoken. In this question, it points toward ${theme.challenge}.`,
+    "The Moon": `The Moon suggests that not everything is visible yet. Around ${theme.focus}, emotions may be louder than facts right now.`,
+    "The Lantern": `The Lantern says clarity will come one step at a time. The next move is not to solve everything, but to see the nearest truth clearly.`,
+    "The Storm": `The Storm shows pressure, disruption, and necessary release. Something around this question may need to break open before it can become honest.`,
+    "The Wolf": `The Wolf speaks of loyalty, instinct, and protection. Ask yourself who or what you are protecting, and whether that protection still serves you.`,
+    "The River": `The River points to change that cannot be forced. The situation is moving, even if it feels still on the surface.`,
+    "The Crown": `The Crown asks you to reclaim authority. This question may be less about what will happen and more about what you are willing to choose.`,
+    "The Door": `The Door appears when a threshold is near. One version of your life may be asking to close so another can begin.`,
+    "The Bridge": `The Bridge suggests transition, repair, and connection. There may be a way forward, but it requires crossing from thought into action.`,
+    "The Phoenix": `The Phoenix brings renewal after exhaustion or loss. Something in this question may be asking to be transformed rather than rescued.`,
+    "The Mirror": `The Mirror reflects the truth you already suspect. The Chamber asks you to look directly at your own role in the pattern.`,
+    "The Flame": `The Flame reveals desire, courage, and risk. Something in you still burns for a reason. Do not ignore that signal.`
+  };
+
+  return meanings[cardName] || `This card brings symbolic guidance connected to ${theme.focus}.`;
+}
+
+function generateReading() {
+  const questionRaw = document.getElementById("userQuestion").value.trim();
+  const question = questionRaw || "the question you have not yet spoken aloud";
+  const theme = detectTheme(question);
+
+  const first = selectedCards[0];
+  const second = selectedCards[1];
+  const third = selectedCards[2];
+
+  const reading = `
+    <p><strong>Your Question:</strong> ${question}</p>
+
+    <p><strong>The Chamber senses this question is centered on ${theme.focus}.</strong></p>
+
+    <p><strong>${first}</strong><br>
+    ${cardMeaning(first, theme)}</p>
+
+    <p><strong>${second}</strong><br>
+    ${cardMeaning(second, theme)}</p>
+
+    <p><strong>${third}</strong><br>
+    ${cardMeaning(third, theme)}</p>
+
+    <p><strong>The Oracle Speaks:</strong><br>
+    This question is not random. It has appeared because some part of you is ready to stop circling the same uncertainty. The Chamber does not offer a fixed prediction, but it does reveal a pattern: ${theme.challenge}. The path ahead asks for honesty before action, and action before certainty.</p>
+
+    <p>Your next step is this: ${theme.advice}.</p>
+
+    <div class="blurred">
+      <p><strong>The Hidden Page:</strong><br>
+      Beneath this question is a deeper choice. One path asks you to remain where things are familiar but unresolved. Another asks you to move toward a truth you may already know but have not fully admitted. The cards suggest that the next seven days should be used for observation, not panic. Watch what repeats. Watch what drains you. Watch what gives you energy. The answer will not arrive as thunder. It will arrive as recognition.</p>
+
+      <p><strong>The Final Sign:</strong><br>
+      When the same thought returns three times, do not dismiss it. The Chamber marks it as a signal.</p>
+    </div>
+  `;
+
+  document.getElementById("readingText").innerHTML = reading;
+  showScreen("reading");
+
     }
 
     createCards();
